@@ -1,0 +1,53 @@
+{
+    "name": "vdeapps/phpcore-doctrine-model",
+    "type": "library",
+    "description": "Doctrine Querybuilder front",
+    "keywords": [
+        "vdeapps",
+        "library",
+        "database",
+        "doctrine",
+        "dbal"
+    ],
+    "homepage": "https://github.com/vdeapps/phpcore-doctrine-model",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "vdeApps",
+            "email": "vdeapps@riseup.net",
+            "homepage": "https://github.com/vdeapps/phpcore-doctrine-model",
+            "role": "Developer"
+        }
+    ],
+    "support": {
+        "email": "vdeapps@riseup.net",
+        "issues": "https://github.com/vdeapps/phpcore-doctrine-model/issues"
+    },
+    "config": {
+        "platform": {
+            "php": "7.0.99"
+        }
+    },
+    "require": {
+        "php": ">=7.0.0",
+        "doctrine/dbal" : "^2.5"
+    },
+    "require-dev": {
+        "squizlabs/php_codesniffer": "3.*"
+    },
+    "suggest": {
+    },
+    "autoload": {
+        "psr-4": {
+            "vdeApps\\phpCore\\dbModel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "": "tests/"
+        }
+    },
+    "scripts": {
+        "cs-fix": "php-cs-fixer fix . --fixers=-psr0"
+    }
+}
