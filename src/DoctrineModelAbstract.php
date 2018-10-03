@@ -1235,7 +1235,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
      * @return array
      * @throws Exception
      */
-    private function read($options = null)
+    public function read($options = null)
     {
         $this->buildFilters();
         
