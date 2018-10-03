@@ -58,8 +58,19 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         $this->dictionary = new Dictionary();
         $this->lastMessage = ChainedArray::getInstance();
         
+        /**
+         * Default viewname, view fields
+         */
+        if (empty($this->getViewname())) {
+            $this->setViewName($this->getTablename());
+        }
+        
+        if (empty($this->getVFields())) {
+            $this->setVFields($this->getFields());
+        }
+        
         return $this;
-    }      //Querybuilder
+    }
     
     /**
      * Converts a value from its PHP representation to its database representation
@@ -238,6 +249,14 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     }
     
     /**
+     * @return false|array
+     */
+    public function getTableName()
+    {
+        return $this->settings['tablename'];
+    }
+    
+    /**
      * Set viewname
      *
      * @param $viewname
@@ -249,6 +268,14 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         $this->settings['viewname'] = $viewname;
         
         return $this;
+    }
+    
+    /**
+     * @return false|array
+     */
+    public function getViewname()
+    {
+        return $this->settings['viewname'];
     }
     
     /**
@@ -1191,6 +1218,38 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     }
     
     /**
+     * Lecture des données
+     *
+     * @param null $options
+     *
+     * @return array
+     * @throws Exception
+     */
+    public function read($options = null)
+    {
+        $this->buildFilters();
+        
+        if (is_array($options)) {
+            $this->setOptions($options);
+        }
+        
+        try {
+            $res = $this->qb->execute();
+            $this->rows = $res->fetchAll();
+            
+            return $this->rows;
+        }
+        catch (Exception $ex) {
+            //            echo $this->debugSql();
+            //            echo $ex->getMessage();
+            $this->setMessage("Erreur de lecture des données", 100, $ex->getMessage() . "\n" . $this->debugSql());
+            throw new Exception($this->lastMessage->message, $this->lastMessage->code);
+        }
+        
+        return [];
+    }
+    
+    /**
      * set Last message
      *
      * @param      $message
@@ -1225,37 +1284,5 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         }
         
         return $this;
-    }
-    
-    /**
-     * Lecture des données
-     *
-     * @param null $options
-     *
-     * @return array
-     * @throws Exception
-     */
-    public function read($options = null)
-    {
-        $this->buildFilters();
-        
-        if (is_array($options)) {
-            $this->setOptions($options);
-        }
-        
-        try {
-            $res = $this->qb->execute();
-            $this->rows = $res->fetchAll();
-            
-            return $this->rows;
-        }
-        catch (Exception $ex) {
-            //            echo $this->debugSql();
-            //            echo $ex->getMessage();
-            $this->setMessage("Erreur de lecture des données", 100, $ex->getMessage() . "\n" . $this->debugSql());
-            throw new Exception($this->lastMessage->message, $this->lastMessage->code);
-        }
-        
-        return [];
     }
 }
