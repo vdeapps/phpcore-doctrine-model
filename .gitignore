@@ -3,3 +3,4 @@ composer.phar
 /vendor/
 *.lock
 *.tmp
+/tests/*.db
