@@ -74,9 +74,11 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     {
         if (is_null($value)) {
             $value = 'NULL';
-        } elseif (empty($value)) {
+        }
+        elseif (empty($value)) {
             $value = (is_null($empty)) ? 'NULL' : self::convertToDatabaseValue($empty);
-        } elseif (is_string($value)) {
+        }
+        elseif (is_string($value)) {
             $value = '\'' . str_replace('\'', '\'\'', $value) . '\'';
         }
         
@@ -147,11 +149,13 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                     $value = null;
                     
                     return true;
-                } elseif (strtoupper($value) === 'NOW') {
+                }
+                elseif (strtoupper($value) === 'NOW') {
                     $value = $dt->set_date()->toSql();
                     
                     return true;
-                } else {
+                }
+                else {
                     if ($dt->set_date($value)) {
                         $value = $dt->toSql();
                         
@@ -328,7 +332,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                 // Clé indexé
                 if (is_numeric($key)) {
                     $tbFields[] = $val;
-                } else {
+                }
+                else {
                     // Clé chaine
                     $tbFields[] = "$key";
                     
@@ -337,7 +342,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                 }
             }
             $this->fieldsSelect = $tbFields;
-        } else {
+        }
+        else {
             $this->fieldsSelect = $this->getModelSettings('vfields', 'keys');
         }
         
@@ -368,7 +374,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         
         if (array_key_exists($name, $this->settings)) {
             return $this->settings[$name];
-        } else {
+        }
+        else {
             return false;
         }
     }
@@ -470,7 +477,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                 if (!is_array($v)) {
                     $this->qb->andWhere("$v");
                     continue;
-                } else {
+                }
+                else {
                     // Sinon on construit la requête: $v = [ $fields => $val
                     $k = array_keys($v)[0];
                     $v = $v[$k];
@@ -495,11 +503,13 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                             $this->qb->andWhere("$k $op");
                             break;
                     }
-                } else {
+                }
+                else {
                     if (strpos($k, '_expr_') !== false) {
                         $this->qb->andWhere($v);
                         $this->removeFilter($k);
-                    } elseif (is_array($v)) {
+                    }
+                    elseif (is_array($v)) {
                         // On test si la clé est un opérateur
                         // ou l'indice 0 du tableau (IN par défaut si pas d'operateur)
                         $qbOP = array_keys($v)[0];
@@ -510,7 +520,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                         if ($op === false) {
                             $qbOP = QBop::IN;
                             $op = QBop::getOp($qbOP);
-                        } else {
+                        }
+                        else {
                             // On écrase la valeur par celle du tableau
                             $v = $v[$qbOP];
                         }
@@ -559,7 +570,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                                 $this->removeFilter($k);
                                 break;
                         }
-                    } else {
+                    }
+                    else {
                         //Sinon on fait une égalité
                         $this->qb->andWhere("$k = :$randId");
                         $this->qb->setParameter($randId, $v);
@@ -567,7 +579,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                     }
                 }
                 $this->removeFilter($k);
-            } else {
+            }
+            else {
             }
         }
         
@@ -613,7 +626,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
             foreach ($keys as $value) {
                 $this->removeFilter($value);
             }
-        } else {
+        }
+        else {
             if (array_key_exists($keys, $this->filters)) {
                 unset($this->filters[$keys]);
             }
@@ -631,7 +645,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     {
         try {
             return $this->qb->execute();
-        } catch (DBALException $ex) {
+        }
+        catch (DBALException $ex) {
             // Pas de Log pour l'écriture dans LOG sinon ça boucle !!!!!
             if (strtolower($this->settings['tablename']) != 'log') {
                 $this->rollBack();
@@ -695,7 +710,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
             if ($existsKeyNotChecked) {
                 if (array_key_exists($key, $row)) {
                     $existsKeyNotChecked = false;
-                } else {
+                }
+                else {
                     return false;
                 }
             }
@@ -707,7 +723,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                 if ($multiple === false) {
                     $tbRes = $row;
                     break;
-                } else {
+                }
+                else {
                     $tbRes[] = $row;
                 }
             }
@@ -737,7 +754,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         if (is_numeric($index)) {
             if (isset($this->rows[$index])) {
                 return $this->rows[$index];
-            } else {
+            }
+            else {
                 return false;
             }
         }
@@ -770,13 +788,11 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
      *
      * @param array $adata
      *
-     * @return $this
-     * @throws Exception
+     * @return array
      */
-    public function addCalcFields(&$adata = [])
+    public function addCalcFields($adata = [])
     {
-        
-        return $this;
+        return $adata;
     }
     
     /**
@@ -804,13 +820,15 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                 $this->qb->resetQueryParts();
                 
                 return $this->create($aSet);
-            } else {
+            }
+            else {
                 // Sinon mise à jour
                 $this->qb->resetQueryParts();
                 
                 return $this->update($aSet, $aClauses);
             }
-        } catch (Exception $ex) {
+        }
+        catch (Exception $ex) {
             $this->setMessage($ex->getMessage(), $ex->getCode());
             throw $ex;
             
@@ -853,9 +871,27 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                     case 'orderby':
                         if (false === $value) {
                             $this->qb->resetQueryPart('orderBy');
-                            break;
                         }
-                        $this->qb->orderBy($value);
+                        else {
+                            if (is_array($value)) {
+                                $this->qb->resetQueryPart('orderBy');
+                                foreach ($value as $k => $v) {
+                                    if (is_numeric($k)) {
+                                        $this->qb->addOrderBy($v);
+                                    }
+                                    else {
+                                        $this->qb->addOrderBy($k, $v);
+                                    }
+                                }
+                            }
+                            elseif (is_string($value)) {
+                                $this->qb->orderBy($value);
+                            }
+                        }
+                        break;
+                    
+                    case 'having':
+                        $this->qb->having($value);
                         break;
                 }
             }
@@ -878,7 +914,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         
         try {
             $this->buildWriteFields($aSet, QueryBuilder::INSERT);
-        } catch (Exception $ex) {
+        }
+        catch (Exception $ex) {
             $this->setMessage($ex->getMessage(), $ex->getCode());
             throw $ex;
             
@@ -920,9 +957,11 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         }
         if ($type == QueryBuilder::INSERT) {
             $fctWrite = 'setValue';
-        } elseif ($type == QueryBuilder::UPDATE) {
+        }
+        elseif ($type == QueryBuilder::UPDATE) {
             $fctWrite = 'set';
-        } else {
+        }
+        else {
             $this->setMessage("Erreur sur le type de donnée: $type", 10);
             throw new Exception($this->lastMessage->message, $this->lastMessage->code);
             
@@ -969,7 +1008,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                         call_user_func([$this->qb, $fctWrite], $field, ":$field");
                         if (is_null($value)) {
                             $this->qb->setParameter("$field", null, Type::DATETIME);
-                        } else {
+                        }
+                        else {
                             $this->qb->setParameter("$field", $value, Type::STRING);
                         }
                         break;
@@ -997,7 +1037,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     /**
      * Retourne le lastInsertID
      *
-     * @param string|null $seqname
+     * @param string|null $seqname nom de la sequence
      *
      * @return mixed|false
      */
@@ -1006,7 +1046,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         $seqname = (is_null($seqname)) ? $this->getSequence() : $seqname;
         try {
             return $this->getConnection()->lastInsertId($seqname);
-        } catch (Exception $ex) {
+        }
+        catch (Exception $ex) {
             return false;
         }
     }
@@ -1031,7 +1072,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         
         try {
             $this->buildWriteFields($aSet, QueryBuilder::UPDATE);
-        } catch (Exception $ex) {
+        }
+        catch (Exception $ex) {
             $this->setMessage($ex->getMessage(), $ex->getCode());
             throw new Exception($this->lastMessage->message, $this->lastMessage->code);
             
@@ -1096,7 +1138,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         
         if (is_string($this->settings['pk'])) {
             return $this->settings['pk'];
-        } else {
+        }
+        else {
             return array_values($this->settings['pk'])[0];
         }
     }
@@ -1171,13 +1214,13 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
      */
     protected function buildBase()
     {
-        $this->newQB();
-        $this->qb->resetQueryParts();
+        $this->newQB()->resetQueryPart();
         $this->qb->from($this->getModelSettings('viewname'));
         
         if ($this->getSelect() !== false) {
             $this->qb->select($this->getSelect());
-        } else {
+        }
+        else {
             $this->qb->select($this->getModelSettings('vfields', 'keys'));
         }
         
@@ -1205,7 +1248,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
             $this->rows = $res->fetchAll();
             
             return $this->rows;
-        } catch (Exception $ex) {
+        }
+        catch (Exception $ex) {
             //            echo $this->debugSql();
             //            echo $ex->getMessage();
             $this->setMessage("Erreur de lecture des données", 100, $ex->getMessage() . "\n" . $this->debugSql());
