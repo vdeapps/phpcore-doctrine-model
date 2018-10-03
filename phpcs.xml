@@ -12,12 +12,7 @@
     <arg name="colors"/>
     <arg value="p"/>
 
-    <file>public/index.php</file>
-    <file>app</file>
-    <exclude-pattern>*/app/Views/*</exclude-pattern>
-    <exclude-pattern>*/app/Themes/*</exclude-pattern>
-
-    <exclude-pattern>*/app/assets/*</exclude-pattern>
+    <file>src</file>
 
     <!-- Warn about lines longer than 135 chars, and never error. -->
     <rule ref="Generic.Files.LineLength">
