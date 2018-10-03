@@ -1,11 +1,13 @@
 {
     "name": "vdeapps/phpcore-doctrine-model",
     "type": "library",
-    "description": "Doctrine Querybuilder Frontend",
+    "description": "Simple Doctrine Querybuilder",
     "keywords": [
         "vdeapps",
         "library",
         "database",
+        "mysql",
+        "oracle",
         "doctrine",
         "dbal"
     ],
