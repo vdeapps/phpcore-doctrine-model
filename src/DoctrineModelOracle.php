@@ -33,8 +33,7 @@ abstract class DoctrineModelOracle extends DoctrineModelAbstract
         
         try {
             return $rows[0]['NEXTVAL'];
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -58,8 +57,7 @@ abstract class DoctrineModelOracle extends DoctrineModelAbstract
         
         try {
             return $rows[0]['CURRVAL'];
-        }
-        catch (Exception $e) {
+        } catch (Exception $e) {
             return false;
         }
     }
@@ -85,8 +83,7 @@ abstract class DoctrineModelOracle extends DoctrineModelAbstract
             }
             
             parent::create($aSet);
-        }
-        catch (Exception $ex) {
+        } catch (Exception $ex) {
             return false;
         }
         

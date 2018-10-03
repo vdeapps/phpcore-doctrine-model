@@ -76,6 +76,4 @@ interface DoctrineModelInterface
      * @return mixed The PHP representation of the value.
      */
     public static function convertToPHPValue($value);
-    
-    
 }

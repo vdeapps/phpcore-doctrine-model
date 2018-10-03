@@ -11,12 +11,14 @@ use vdeApps\phpCore\DoctrineModel\DoctrineModelAbstract;
 use vdeApps\phpCore\DoctrineModel\QBop;
 use vdeApps\phpCore\Helper;
 
-class TableTest extends DoctrineModelAbstract {
+class TableTest extends DoctrineModelAbstract
+{
     
     public $settings = [
         'tablename' => 'people',
         'viewname'  => 'v_people',
         'pk'        => 'pk_people',
+        'sequence'  => null,
         'fields'    => [
             'pk_people'     => Type::INTEGER,
             'nom'           => Type::STRING,
@@ -55,7 +57,8 @@ class TableTest extends DoctrineModelAbstract {
     
 }
 
-class ModelTest extends TestCase {
+class ModelTest extends TestCase
+{
     
     /** @var Connection */
     protected $conn = false;
@@ -64,56 +67,57 @@ class ModelTest extends TestCase {
     
     protected $queries = false;
     
-    public function testModel() {
+    public function testModel()
+    {
         $this->createConn();
         $this->createTables();
         
         $this->table = new TableTest($this->conn);
-    
+        
         try {
             $rows = $this->table->getAll();
             $this->assertEquals(2, count($rows));
-    
+            
             $rows = $this->table->getAll(['pk_people' => 2]);
             $this->assertEquals(1, count($rows));
-    
+            
             $rows = $this->table->getAll(['nom' => 'zerzer']);
             $this->assertEquals(0, count($rows));
-    
+            
             $rows = $this->table->getAll([
-                'pk_people' => [2, 1]
+                'pk_people' => [2, 1],
             ]);
             $this->assertEquals(2, count($rows));
-    
+            
             $rows = $this->table->getAll([
-                'pk_people' => [QBop::LT => 2]
+                'pk_people' => [QBop::LT => 2],
             ]);
             $this->assertEquals(1, count($rows));
-    
+            
             $rows = $this->table->getAll([
-                'pk_people' => [QBop::GE => 1]
+                'pk_people' => [QBop::GE => 1],
             ]);
             $this->assertEquals(2, count($rows));
             
             echo $this->table->debugSql();
             
             
-            
         }
-        catch (Exception $ex){
+        catch (Exception $ex) {
             echo $ex->getMessage();
             
             
         }
         
-//        echo Helper::pre($rows);
+        //        echo Helper::pre($rows);
     }
     
     /**
      * @return bool|\Doctrine\DBAL\Connection
      * @throws Exception
      */
-    private function createConn() {
+    private function createConn()
+    {
         $user = 'vdeapps';
         $pass = 'vdeapps';
         $path = __DIR__ . '/test.db';
@@ -141,7 +145,8 @@ class ModelTest extends TestCase {
         return $this->conn;
     }
     
-    private function createTables() {
+    private function createTables()
+    {
         
         try {
             $this->conn->exec($this->queries->createTablePeople);
