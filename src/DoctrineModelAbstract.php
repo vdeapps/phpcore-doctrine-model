@@ -23,6 +23,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         'pk'        => false,
         'fields'    => false,
         'vfields'   => false,
+        'sequence'  => null,
     ];
     
     /** @var ChainedArray $lastMessage */
@@ -57,7 +58,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         return $this;
     }      //Querybuilder
     
-/**
+    /**
      * Converts a value from its PHP representation to its database representation
      * of this type.
      *
@@ -81,7 +82,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         return $value;
     }
     
-        /**
+    /**
      * Converts a value from its database representation to its PHP representation
      * of this type.
      *
@@ -92,7 +93,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     public static function convertToPHPValue($value)
     {
         return $value;
-    } // Liste des champs à sélectionner
+    }
     
     /**
      * Test si la valeur correspond au type, remplacé par NULL si besoin
@@ -168,6 +169,14 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         }
         
         return false;
+    } // Liste des champs à sélectionner
+    
+    /**
+     * @return QueryBuilder
+     */
+    public function getQb()
+    {
+        return $this->qb;
     }
     
     /**
@@ -998,13 +1007,22 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     }
     
     /**
+     * @return Connection
+     */
+    public function getConnection()
+    {
+        return $this->conn;
+    }
+    
+    /**
      * Retourne le lastInsertID
      * @return mixed|false
      */
     public function lastInsertId()
     {
+        $seqname = $this->getSequence();
         try {
-            return $this->qb->getConnection()->lastInsertId();
+            return $this->getConnection()->lastInsertId($seqname);
         }
         catch (Exception $ex) {
             return false;
@@ -1128,6 +1146,29 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     }
     
     /**
+     * Set sequence name
+     *
+     * @param $seqname
+     *
+     * @return $this
+     */
+    public function setSequence($seqname)
+    {
+        $this->settings['sequence'] = $seqname;
+        
+        return $this;
+    }
+    
+    /**
+     * retourne la sequence
+     * @return string|null
+     */
+    public function getSequence()
+    {
+        return (!empty($this->settings['sequence'])) ? $this->settings['sequence'] : null;
+    }
+    
+    /**
      * set Last message
      *
      * @param      $message
@@ -1196,5 +1237,4 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         
         return [];
     }
-    
 }
