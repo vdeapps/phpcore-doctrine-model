@@ -11,7 +11,7 @@
 
 namespace vdeApps\phpCore\DoctrineModel;
 
-final class QBop
+class QBop
 {
     /**
      * OPERATOR
