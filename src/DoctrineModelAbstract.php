@@ -47,6 +47,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
      * PagesController constructor.
      *
      * @param Connection $conn
+     *
+     * @throws Exception
      */
     public function __construct($conn)
     {
@@ -200,6 +202,8 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     
     /**
      * @param DictionaryInterface $dictionary
+     *
+     * @throws Exception
      */
     public function setDictionary($dictionary)
     {
@@ -438,6 +442,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
      * sinon le champ est ignoré
      *
      * @return $this
+     * @throws Exception
      */
     public function buildFilters()
     {
@@ -633,7 +638,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     
     /**
      * Ecriture des données
-     * @return nombre|false de lignes modifiées
+     * @return integer|false de lignes modifiées
      * @throws Exception
      */
     public function execute()
@@ -838,7 +843,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
      *
      * @param array $options [limit=>1, groupBy=>'....', order=>'....'
      *
-     * @return DoctrineModelInterfaceAbstract
+     * @return DoctrineModelInterface
      */
     public function setOptions($options)
     {
@@ -1016,11 +1021,14 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     
     /**
      * Retourne le lastInsertID
+     *
+     * @param string|null $seqname
+     *
      * @return mixed|false
      */
-    public function lastInsertId()
+    public function lastInsertId($seqname = null)
     {
-        $seqname = $this->getSequence();
+        $seqname = (is_null($seqname)) ? $this->getSequence() : $seqname;
         try {
             return $this->getConnection()->lastInsertId($seqname);
         }
