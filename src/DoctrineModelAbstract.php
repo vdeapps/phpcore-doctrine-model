@@ -186,6 +186,32 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     } // Liste des champs à sélectionner
     
     /**
+     * Retourne le tableau de résulats par une autre clé
+     *
+     * @param $key
+     *
+     * @return array
+     */
+    public static function indexedBy(&$array, $newKey, $append = false)
+    {
+        $result = [];
+        $nbRows = count($array);
+        
+        foreach ($array as $row) {
+            $valOfKey = $row[$newKey];
+            
+            if ($append === false) {
+                $result[$valOfKey] = $row;
+            }
+            else {
+                $result[$valOfKey][] = $row;
+            }
+        }
+        
+        return $result;
+    }
+    
+    /**
      * @return QueryBuilder
      */
     public function getQb()
@@ -789,26 +815,19 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
         
         return $this->rows;
     }
-    
-    /**
-     * Retourne le tableau de résulats par une autre clé
-     *
-     * @param $key
-     *
-     * @return array
-     */
-    public function indexedBy($key)
-    {
-        $res = [];
-        
-        $nbRows = $this->rowsCount();
-        for ($i = 0; $i < $nbRows; $i++) {
-            $row = $this->rows($i);
-            $res[$row[$key]][] = $row;
-        }
-        
-        return $res;
-    }
+    //
+    //    public function indexedBy($key)
+    //    {
+    //        $res = [];
+    //
+    //        $nbRows = $this->rowsCount();
+    //        for ($i = 0; $i < $nbRows; $i++) {
+    //            $row = $this->rows($i);
+    //            $res[$row[$key]][] = $row;
+    //        }
+    //
+    //        return $res;
+    //    }
     
     /**
      * Ajoute les champs calculés et test les valeurs
@@ -864,6 +883,83 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
     }
     
     /**
+     * Set the Limit
+     *
+     * @param     $maxResult
+     * @param int $offset
+     *
+     * @return $this
+     * @throws Exception
+     */
+    public function setLimit($maxResult, $offset = 0)
+    {
+        if (!is_numeric($maxResult) || !is_numeric($offset)) {
+            throw new \Exception("Bad type for limit");
+        }
+        $this->qb->setFirstResult($offset)->setMaxResults($maxResult);
+        
+        return $this;
+    }
+    
+    /**
+     * Set Group by
+     *
+     * @param false|string $value false to disable groupby
+     *
+     * @return $this
+     */
+    public function setGroupby($value)
+    {
+        if (false === $value) {
+            $this->qb->resetQueryPart('groupBy');
+        }
+        else {
+            $this->qb->groupBy($value);
+        }
+        
+        return $this;
+    }
+    
+    /**
+     * add Order by
+     *
+     * @param false|string|array $value false:disable, array: [ 'field', 'field2'=>'asc|desc']
+     *
+     * @return $this
+     */
+    public function setOrderby($value)
+    {
+        if (false === $value) {
+            $this->qb->resetQueryPart('orderBy');
+        }
+        else {
+            if (is_array($value)) {
+                $this->qb->resetQueryPart('orderBy');
+                foreach ($value as $k => $v) {
+                    if (is_numeric($k)) {
+                        $this->qb->addOrderBy($v);
+                    }
+                    else {
+                        $this->qb->addOrderBy($k, $v);
+                    }
+                }
+            }
+            elseif (is_string($value)) {
+                $this->qb->orderBy($value);
+            }
+        }
+        
+        return $this;
+    }
+    
+    public function setHaving($value)
+    {
+        $this->qb->having($value);
+        
+        return $this;
+    }
+    
+    /**
      * Ajout des options à la requête
      *
      * @param array $options [limit=>1, groupBy=>'....', order=>'....'
@@ -884,41 +980,32 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                         break;
                     
                     case 'limit':
-                        $this->qb->setFirstResult(0)->setMaxResults($value);
+                        if (preg_match('/(?<max>\d)+(.)*OFFSET(.)*(?<offset>\d)+/i', $input_line, $output_array)) {
+                            $offset = $output_array['offset'];
+                            $maxResult = $output_array['max'];
+                        }
+                        elseif (preg_match('/(?<offset>\d)+(.)*,(.)*(?<max>\d)+/i', $input_line, $output_array)) {
+                            $offset = $output_array['offset'];
+                            $maxResult = $output_array['max'];
+                        }
+                        else {
+                            $offset = 0;
+                            $maxResult = trim($value);
+                        }
+                        
+                        $this->setLimit($offset, $firstResult);
                         break;
                     
                     case 'groupby':
-                        if (false === $value) {
-                            $this->qb->resetQueryPart('groupBy');
-                            break;
-                        }
-                        $this->qb->groupBy($value);
+                        $this->setGroupby($value);
                         break;
                     
                     case 'orderby':
-                        if (false === $value) {
-                            $this->qb->resetQueryPart('orderBy');
-                        }
-                        else {
-                            if (is_array($value)) {
-                                $this->qb->resetQueryPart('orderBy');
-                                foreach ($value as $k => $v) {
-                                    if (is_numeric($k)) {
-                                        $this->qb->addOrderBy($v);
-                                    }
-                                    else {
-                                        $this->qb->addOrderBy($k, $v);
-                                    }
-                                }
-                            }
-                            elseif (is_string($value)) {
-                                $this->qb->orderBy($value);
-                            }
-                        }
+                        $this->setOrderby($value);
                         break;
                     
                     case 'having':
-                        $this->qb->having($value);
+                        $this->setHaving($value);
                         break;
                 }
             }
@@ -1273,7 +1360,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
      */
     protected function buildBase()
     {
-        $this->newQB()->resetQueryPart();
+        $this->newQB()->resetQueryParts();
         $this->qb->from($this->getModelSettings('viewname'));
         
         if ($this->getSelect() !== false) {

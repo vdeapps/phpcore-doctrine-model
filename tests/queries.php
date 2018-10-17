@@ -21,7 +21,6 @@ return [
     horo                     DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ",
-
-    'createViewPeople'=>
+    'createViewPeople'  =>
         "CREATE VIEW IF NOT EXISTS v_people as select * from people;",
 ];

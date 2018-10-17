@@ -8,10 +8,11 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use vdeApps\phpCore\ChainedArray;
 use vdeApps\phpCore\DoctrineModel\DoctrineModelAbstract;
+use vdeApps\phpCore\DoctrineModel\DoctrineModelSqlite;
 use vdeApps\phpCore\DoctrineModel\QBop;
 use vdeApps\phpCore\Helper;
 
-class TableTest extends DoctrineModelAbstract
+class TableTest extends DoctrineModelSqlite
 {
     
     public $settings = [
@@ -77,6 +78,14 @@ class ModelTest extends TestCase
         try {
             $rows = $this->table->getAll();
             $this->assertEquals(2, count($rows));
+    
+            $this->table->setLimit(1);
+            $rows = $this->table->read();
+            $this->assertEquals(1, count($rows));
+    
+            $this->table->setLimit(1, 1);
+            $rows = $this->table->read();
+            $this->assertEquals(1, count($rows));
             
             $rows = $this->table->getAll(['pk_people' => 2]);
             $this->assertEquals(1, count($rows));
@@ -99,14 +108,9 @@ class ModelTest extends TestCase
             ]);
             $this->assertEquals(2, count($rows));
             
-            echo $this->table->debugSql();
-            
-            
         }
         catch (Exception $ex) {
             echo $ex->getMessage();
-            
-            
         }
         
         //        echo Helper::pre($rows);
@@ -147,13 +151,13 @@ class ModelTest extends TestCase
     
     private function createTables()
     {
-        
         try {
             $this->conn->exec($this->queries->createTablePeople);
             $this->conn->exec($this->queries->createViewPeople);
         }
         catch (Exception $ex) {
-        
+            echo $ex->getMessage();
+            throw $ex;
         }
         
         return $this;
