@@ -993,7 +993,7 @@ abstract class DoctrineModelAbstract implements DoctrineModelInterface
                             $maxResult = trim($value);
                         }
                         
-                        $this->setLimit($offset, $firstResult);
+                        $this->setLimit($maxResult, $offset);
                         break;
                     
                     case 'groupby':
